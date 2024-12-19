@@ -1,5 +1,7 @@
 # Toolbase
 
+<img width="1392" alt="app" src="https://github.com/user-attachments/assets/d60edc11-cabb-49c8-ba52-1a1418a9ebea" />
+
 Toolbase is a desktop application that makes it easy to add tools and plugins to Claude and AI Platforms. It provides a simple interface for discovering, installing, and managing tools without requiring technical expertise.
 
 Learn more at [https://gettoolbase.ai](https://gettoolbase.ai)
