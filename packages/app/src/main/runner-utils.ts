@@ -5,7 +5,7 @@ import { type ServerConfig } from '../shared/types/servers';
 import { getEsmUrl } from '../shared/utils';
 import {
   CACHE_DIR_NAME,
-  DEV_RUNNER_RELATIVE_PATH,
+  DEV_BIN_RELATIVE_PATH,
   HOME_SETTINGS_DIR_NAME,
   RUNNER_NAME,
 } from './constants';
@@ -95,8 +95,21 @@ function createRunnerArgs(
   return [moduleOption, cacheOption, ...allCustomArgs];
 }
 
+function getRunnerName() {
+  switch (process.platform) {
+    case 'win32':
+      return `${RUNNER_NAME}.exe`;
+    default:
+      return RUNNER_NAME;
+  }
+}
+
 function getSettingsRunnerPath() {
-  return path.join(app.getPath('home'), HOME_SETTINGS_DIR_NAME, RUNNER_NAME);
+  return path.join(
+    app.getPath('home'),
+    HOME_SETTINGS_DIR_NAME,
+    getRunnerName(),
+  );
 }
 
 function getCachePath() {
@@ -110,7 +123,7 @@ function getCachePath() {
 function getLocalRunnerPath() {
   if (!app.isPackaged) {
     // During development, use the locally built toolbase runner.
-    return path.resolve(DEV_RUNNER_RELATIVE_PATH);
+    return path.resolve(DEV_BIN_RELATIVE_PATH, getRunnerName());
   }
-  return `${process.resourcesPath}/${RUNNER_NAME}`;
+  return `${process.resourcesPath}/${getRunnerName()}`;
 }

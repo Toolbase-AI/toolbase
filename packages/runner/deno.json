@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "deno run -A mod.ts",
-    "build": "deno compile -A -o ./out/toolbase-runner mod.ts"
+    "build": "deno run -A scripts/build.ts"
   },
   "imports": {
     "@deno/cache-dir": "jsr:@deno/cache-dir@^0.14.0",
