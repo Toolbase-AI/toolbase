@@ -4,4 +4,4 @@ export const CACHE_DIR_NAME = 'cache';
 
 export const RUNNER_NAME = 'toolbase-runner';
 
-export const DEV_RUNNER_RELATIVE_PATH = `./bin/${RUNNER_NAME}`;
+export const DEV_BIN_RELATIVE_PATH = `./bin`;

@@ -2,25 +2,16 @@ import { exec } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { MakerDMG } from '@electron-forge/maker-dmg';
+import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
-import type { ForgeConfig } from '@electron-forge/shared-types';
+import { PublisherGithub } from '@electron-forge/publisher-github';
+import { type ForgeConfig } from '@electron-forge/shared-types';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import { type TargetPlatform } from '@electron/packager';
 
-// function getRunnerTarget (platform: string, arch: string) => {
-//   if (platform === 'darwin') {
-//     if (arch === 'arm64') {
-//       return 'aarch64-apple-darwin';
-//     } else if (arch === 'x64') {
-//       return 'x86_64-apple-darwin';
-//     } else {
-//       throw new Error(`Unsupported architecture: ${arch}`);
-//     }
-//   } else {
-//     throw new Error(`Unsupported platform: ${platform}`);
-//   }
-// };
+const runnerPackageDirPath = path.join(__dirname, '../runner');
 
 function execAsync(
   command: string,
@@ -37,20 +28,39 @@ function execAsync(
   });
 }
 
-// Get runner build path
-const binRunnerBinaryPath = path.join(__dirname, 'bin/toolbase-runner');
-const runnerPackageDirPath = path.join(__dirname, '../runner');
-const runnerPackageBinaryPath = path.join(
-  runnerPackageDirPath,
-  `out/toolbase-runner`,
-);
+function getRunnerPaths(platform: TargetPlatform) {
+  switch (platform) {
+    case 'darwin':
+    case 'mas':
+    case 'linux':
+      return {
+        binLocalRunnerRelativePath: './bin/toolbase-runner',
+        binRunnerBinaryPath: path.join(__dirname, 'bin/toolbase-runner'),
+        runnerPackageBinaryPath: path.join(
+          runnerPackageDirPath,
+          `out/toolbase-runner`,
+        ),
+      };
+    case 'win32':
+      return {
+        binLocalRunnerRelativePath: './bin/toolbase-runner.exe',
+        binRunnerBinaryPath: path.join(__dirname, 'bin/toolbase-runner.exe'),
+        runnerPackageBinaryPath: path.join(
+          runnerPackageDirPath,
+          `out/toolbase-runner.exe`,
+        ),
+      };
+  }
+
+  throw new Error(`Unsupported platform: ${platform}`);
+}
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: './icons/icon',
     // Include the runner binary
-    extraResource: ['./bin/toolbase-runner'],
+    // extraResource: ['./bin/toolbase-runner', './bin/toolbase-runner.exe'],
     osxSign: {
       identity: process.env.APPLE_IDENTITY,
     },
@@ -61,7 +71,7 @@ const config: ForgeConfig = {
     },
   },
   hooks: {
-    async generateAssets() {
+    async generateAssets(config, platform, arch) {
       // @important - This does some smart logic of only rebuilding the runner if necessary, but feels like it could cause lots of headaches.
       // toolbase-runner exists in bin/
       // if (fs.existsSync(binRunnerBinaryPath)) {
@@ -88,25 +98,50 @@ const config: ForgeConfig = {
       //   return;
       // }
 
+      const {
+        binLocalRunnerRelativePath,
+        binRunnerBinaryPath,
+        runnerPackageBinaryPath,
+      } = getRunnerPaths(platform);
+
       // Create it if it doesn't exist
       fs.mkdirSync(path.dirname(binRunnerBinaryPath), { recursive: true });
 
       // Build on demand for the target platform and architecture and copy
-      await execAsync('deno task build', runnerPackageDirPath);
+      const { stdout, stderr } = await execAsync(
+        `deno task build -p ${platform} -a ${arch}`,
+        runnerPackageDirPath,
+      );
+
+      console.log(stdout, stderr);
+
       fs.copyFileSync(runnerPackageBinaryPath, binRunnerBinaryPath);
 
       console.log(
-        `Built and copied "toolbase-runner" from "${runnerPackageBinaryPath}" to "${binRunnerBinaryPath}"`,
+        `Built and copied "toolbase-runner" from "${runnerPackageBinaryPath}" to "${binRunnerBinaryPath} for ${platform}-${arch}"`,
       );
+
+      // Add to our config
+      config.packagerConfig.extraResource = [binLocalRunnerRelativePath];
     },
   },
   rebuildConfig: {},
   makers: [
+    new MakerSquirrel({}),
     new MakerZIP({}, ['darwin']),
     //@ts-expect-error MakerDMS has incorrect types.
     new MakerDMG({
       overwrite: true,
       icon: './icons/icon.icns',
+    }),
+  ],
+  publishers: [
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    new PublisherGithub({
+      repository: { owner: 'toolbase-ai', name: 'toolbase' },
+      prerelease: false,
+      draft: true,
+      generateReleaseNotes: true,
     }),
   ],
   plugins: [
