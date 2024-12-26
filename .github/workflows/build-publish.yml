@@ -101,7 +101,7 @@ jobs:
           trusted-signing-account-name: ${{ secrets.AZURE_CODE_SIGNING_NAME }}
           certificate-profile-name: ${{ secrets.AZURE_CERT_PROFILE_NAME }}
 
-      - name: Publish to GitHub (Dry Run)
+      - name: Publish to GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
         run: npm run publish:ci

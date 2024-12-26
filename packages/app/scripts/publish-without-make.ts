@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { api as forge } from '@electron-forge/core';
 
-console.log(process.argv[2]);
+console.log(process.argv);
 
 const isDryRun = process.argv[2] === '--dry-run';
 
