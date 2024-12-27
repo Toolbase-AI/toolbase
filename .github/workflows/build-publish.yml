@@ -85,7 +85,7 @@ jobs:
       - name: Publish to GitHub (Dry Run)
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
-        run: npm run publish:ci -- --dry-run
+        run: npm run publish:ci -- -- --dry-run
 
       - name: Sign Windows Installer
         if: matrix.platform == 'windows-latest'

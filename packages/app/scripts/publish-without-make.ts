@@ -3,7 +3,7 @@ import { api as forge } from '@electron-forge/core';
 
 console.log(process.argv);
 
-const isDryRun = process.argv[2] === '--dry-run';
+const isDryRun = process.argv[3] === '--dry-run';
 
 console.log(isDryRun ? 'Starting a dry run' : 'Publishing from dry run');
 
