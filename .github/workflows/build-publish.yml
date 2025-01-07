@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        platform: [macos-latest, macos-13, windows-latest]
+        platform: [macos-latest, windows-latest]
 
     defaults:
       run:

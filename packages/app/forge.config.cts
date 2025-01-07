@@ -127,7 +127,10 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      setupIcon: './icons/icon.ico',
+      iconUrl: 'https://gettoolbase.ai/logo.ico',
+    }),
     new MakerZIP({}, ['darwin']),
     //@ts-expect-error MakerDMS has incorrect types.
     new MakerDMG({
