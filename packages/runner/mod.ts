@@ -26,7 +26,7 @@ if (!moduleName) {
 process.argv = ["", "", ...args["--"]];
 
 // Load and bundle up the module.
-const loadCache = createCache({ root: args.cacheRoot });
+const loadCache = createCache({ root: args.cacheRoot, readOnly: Deno.build.os === "windows" });
 const result = await bundle(moduleName, {
   load(specifier, _isDynamic, cacheSetting, checksum) {
     // If the specifier is a node module, just return it as external.

@@ -32,11 +32,11 @@ async function refreshClaude() {
 
   try {
     if (platform === 'win32') {
-      await execAsync('taskkill /F /IM "Claude.exe" && start "" "Claude.exe"');
+      await execAsync('taskkill /F /IM "Claude.exe"');
     } else if (platform === 'darwin') {
-      await execAsync('killall "Claude" && open -a "Claude"');
+      await execAsync('killall "Claude"');
     } else if (platform === 'linux') {
-      await execAsync('pkill -f "claude" && claude');
+      await execAsync('pkill -f "claude"');
     }
   } catch (error) {
     console.error('Failed to close Claude, assuming it is not running', error);
@@ -46,13 +46,18 @@ async function refreshClaude() {
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Reopen the app
-  if (platform === 'win32') {
-    await execAsync('start "" "Claude.exe"');
-  } else if (platform === 'darwin') {
-    await execAsync('open -a "Claude"');
-  } else if (platform === 'linux') {
-    await execAsync('claude');
+  try {
+    if (platform === 'win32') {
+      await execAsync('start "" "%LocalAppData%\\AnthropicClaude\\Claude.exe"');
+    } else if (platform === 'darwin') {
+      await execAsync('open -a "Claude"');
+    } else if (platform === 'linux') {
+      await execAsync('claude');
+    }
+  } catch (error) {
+    console.error('Failed to open Claude', error);
   }
+ 
 }
 
 /**

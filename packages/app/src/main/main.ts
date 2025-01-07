@@ -14,14 +14,16 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
-    minWidth: 320,
+    minWidth: 360,
     minHeight: 400,
     webPreferences: {
       preload: join(import.meta.dirname, 'preload.js'),
+      devTools: !app.isPackaged,
     },
     show: false,
+    autoHideMenuBar: true,
   });
-
+  
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
