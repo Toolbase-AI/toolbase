@@ -1,3 +1,5 @@
+> ⚠️ We’re currently in the process of updating the open-source Toolbase repository to reflect our latest changes after testing with alpha testers.
+
 # Toolbase
 
 <img width="1392" alt="app" src="https://github.com/user-attachments/assets/d60edc11-cabb-49c8-ba52-1a1418a9ebea" />
